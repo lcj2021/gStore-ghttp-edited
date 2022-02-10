@@ -1428,7 +1428,7 @@ Database::get_query_parse_lock()
 }
 
 int
-Database::query(const string _query, ResultSet& _result_set, FILE* _fp, bool update_flag, bool export_flag)
+Database::query(const string _query, ResultSet& _result_set, FILE* _fp, bool update_flag, bool export_flag, bool batch_flag, const string query_path)
 {
   string dictionary_store_path = this->store_path + "/dictionary.dc";
 
@@ -1614,6 +1614,7 @@ Database::query(const string _query, ResultSet& _result_set, FILE* _fp, bool upd
 
   long tv_final = Util::get_cur_time();
   cout << "Total time used: " << (tv_final - tv_begin) << "ms." << endl;
+  
   //if (general_evaluation.needOutputAnswer())
   if (!export_flag) {
     if (need_output_answer) {
@@ -1622,6 +1623,14 @@ Database::query(const string _query, ResultSet& _result_set, FILE* _fp, bool upd
         ans_num = min(ans_num, (long long)_result_set.output_limit);
       cout << "There has answer: " << ans_num << endl;
       cout << "final result is : " << endl;
+      if (batch_flag)
+      {
+        ofstream out("../res_batch", ios::app);
+        out << query_path << "\t" 
+        << (tv_final - tv_begin) << "\t"
+        << ans_num << endl;
+        out.close();
+      }
       _result_set.output(_fp);
       fprintf(_fp, "\n");
       fflush(_fp); //to empty the output buffer in C (fflush(stdin) not work in GCC)

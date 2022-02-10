@@ -81,8 +81,7 @@ kvstoreobj = $(objdir)KVstore.o $(sitreeobj) $(istreeobj) $(ivtreeobj) $(ivarray
 utilobj = $(objdir)Util.o $(objdir)Bstr.o $(objdir)Stream.o $(objdir)Triple.o $(objdir)BloomFilter.o $(objdir)VList.o
 
 queryobj = $(objdir)SPARQLquery.o $(objdir)BasicQuery.o $(objdir)ResultSet.o  $(objdir)IDList.o \
-		   $(objdir)Varset.o $(objdir)QueryTree.o $(objdir)TempResult.o $(objdir)QueryCache.o \
-		   $(objdir)JumpingLikeJoin.o $(objdir)GeneralEvaluation.o
+		   $(objdir)Varset.o $(objdir)QueryTree.o $(objdir)TempResult.o $(objdir)QueryCache.o $(objdir)GeneralEvaluation.o
 
 signatureobj = $(objdir)SigEntry.o $(objdir)Signature.o
 
@@ -114,7 +113,7 @@ inc = -I./tools/libantlr3c-3.4/ -I./tools/libantlr3c-3.4/include
 
 #gtest
 
-TARGET = $(exedir)gexport $(exedir)gbuild $(exedir)gserver $(exedir)gserver_backup_scheduler $(exedir)gclient $(exedir)gquery $(exedir)gconsole $(api_java) $(exedir)gadd $(exedir)gsub $(exedir)ghttp $(exedir)gmonitor $(exedir)gshow $(exedir)shutdown $(exedir)ginit $(exedir)gdrop $(testdir)update_test $(testdir)dataset_test
+TARGET = $(exedir)gexport $(exedir)gbuild $(exedir)gserver $(exedir)gserver_backup_scheduler $(exedir)gclient $(exedir)gquery $(exedir)gquery_batch $(exedir)gconsole $(api_java) $(exedir)gadd $(exedir)gsub $(exedir)ghttp $(exedir)gmonitor $(exedir)gshow $(exedir)shutdown $(exedir)ginit $(exedir)gdrop $(testdir)update_test $(testdir)dataset_test
 
 all: $(TARGET)
 	@echo "Compilation ends successfully!"
@@ -150,6 +149,9 @@ $(exedir)gbuild: $(lib_antlr) $(objdir)gbuild.o $(objfile)
 
 $(exedir)gquery: $(lib_antlr) $(objdir)gquery.o $(objfile) 
 	$(CC) $(EXEFLAG) -o $(exedir)gquery $(objdir)gquery.o $(objfile) $(library) $(openmp)
+
+$(exedir)gquery_batch: $(lib_antlr) $(objdir)gquery_batch.o $(objfile) 
+	$(CC) $(EXEFLAG) -o $(exedir)gquery_batch $(objdir)gquery_batch.o $(objfile) $(library) $(openmp)
 
 $(exedir)gserver: $(lib_antlr) $(objdir)gserver.o $(objfile) 
 	$(CC) $(EXEFLAG) -o $(exedir)gserver $(objdir)gserver.o $(objfile) $(library) $(openmp)
@@ -199,6 +201,10 @@ $(objdir)gbuild.o: Main/gbuild.cpp Database/Database.h Util/Util.h $(lib_antlr)
 	
 $(objdir)gquery.o: Main/gquery.cpp Database/Database.h Util/Util.h $(lib_antlr)
 	$(CC) $(CFLAGS) Main/gquery.cpp $(inc) -o $(objdir)gquery.o $(openmp) #-DREADLINE_ON
+	#add -DREADLINE_ON if using readline
+
+$(objdir)gquery_batch.o: Main/gquery_batch.cpp Database/Database.h Util/Util.h $(lib_antlr)
+	$(CC) $(CFLAGS) Main/gquery_batch.cpp $(inc) -o $(objdir)gquery_batch.o $(openmp) #-DREADLINE_ON
 	#add -DREADLINE_ON if using readline
 
 $(objdir)gserver.o: Main/gserver.cpp Server/Server.h Util/Util.h $(lib_antlr)
@@ -387,9 +393,6 @@ $(objdir)TempResult.o: Query/TempResult.cpp Query/TempResult.h Query/RegexExpres
 $(objdir)QueryCache.o: Query/QueryCache.cpp Query/QueryCache.h $(objdir)Util.o $(objdir)QueryTree.o \
 	$(objdir)TempResult.o $(objdir)Varset.o
 	$(CC) $(CFLAGS) Query/QueryCache.cpp $(inc) -o $(objdir)QueryCache.o $(openmp)
-
-$(objdir)JumpingLikeJoin.o: Query/JumpingLikeJoin.cpp Query/JumpingLikeJoin.h $(objdir)Util.o $(objdir)TempResult.o
-	$(CC) $(CFLAGS) Query/JumpingLikeJoin.cpp $(inc) -o $(objdir)JumpingLikeJoin.o $(openmp)
 
 #no more using $(objdir)Database.o
 $(objdir)GeneralEvaluation.o: Query/GeneralEvaluation.cpp Query/GeneralEvaluation.h Query/RegexExpression.h \

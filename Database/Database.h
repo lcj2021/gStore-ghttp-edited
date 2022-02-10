@@ -50,7 +50,7 @@ class Database {
   bool load();
   bool unload();
   void clear();
-  int query(const string _query, ResultSet& _result_set, FILE* _fp = stdout, bool update_flag = true, bool export_flag = false);
+  int query(const string _query, ResultSet& _result_set, FILE* _fp = stdout, bool update_flag = true, bool export_flag = false, bool batch_flag = false, const string query_path = NULL);
 
   //1. if subject of _triple doesn't exist,
   //then assign a new subid, and insert a new SigEntry
